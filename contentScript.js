@@ -1,5 +1,5 @@
 (() => {
-  let youtubeLeftControls, youtubePlayer;
+  let youtubeLeftControls, youtubePlayer; //allows us to manipulate these
   let currentVideo = "";
   let currentVideoBookmarks = [];
 
@@ -12,14 +12,14 @@
   };
 
   const addNewBookmarkEventHandler = async () => {
-    const currentTime = youtubePlayer.currentTime;
+    const currentTime = youtubePlayer.currentTime; //captures the current time off the dom
     const newBookmark = {
       time: currentTime,
-      desc: "Bookmark at " + getTime(currentTime),
+      desc: `Bookmark at ${getTime(currentTime)}`,
     };
 
     currentVideoBookmarks = await fetchBookmarks();
-
+    console.log("timestamp", newBookmark);
     chrome.storage.sync.set({
       [currentVideo]: JSON.stringify([...currentVideoBookmarks, newBookmark].sort((a, b) => a.time - b.time))
     });
@@ -46,10 +46,11 @@
   };
 
   chrome.runtime.onMessage.addListener((obj, sender, response) => {
+    //listens to the messages coming in from the background.js, hears the type, value and videoID
     const { type, value, videoId } = obj;
 
     if (type === "NEW") {
-      currentVideo = videoId;
+      currentVideo = videoId; //set the global variable currentVideo with the id of the video
       newVideoLoaded();
     } else if (type === "PLAY") {
       youtubePlayer.currentTime = value;
@@ -64,8 +65,8 @@
   newVideoLoaded();
 })();
 
-const getTime = t => {
-  var date = new Date(0);
+const getTime = (t) => {
+  let date = new Date(0);
   date.setSeconds(t);
 
   return date.toISOString().substr(11, 8);
